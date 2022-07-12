@@ -1,0 +1,8 @@
+---
+title: "README"
+author: "Jonathan Kogan"
+date: '2022-07-12'
+output: html_document
+---
+
+This is a project by Jonathan Kogan analyzing data on the top spotify songs overe the last 20 years. The dataset to this project can be found here: [Kaggle](https://www.kaggle.com/datasets/paradisejoy/top-hits-spotify-from-20002019)
