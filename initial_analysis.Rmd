@@ -18,36 +18,36 @@ songs <- read.csv("data/songs_normalize.csv")
 ```{r}
 
 over70 <- filter(songs, popularity > 70)
-over70
+#over70
 
 Drake <- filter(songs, artist == "Drake")
-arrange(Drake, desc(popularity))
+head(arrange(Drake, desc(popularity)))
 ggplot(data = over70, aes(x =  explicit)) + geom_bar() + labs(x = "Explicit or Not Explicit", y = "Number of songs", title = "Number of Explicit and Non explicit songs with popularity > 70");
 
 notExplicit <- filter(songs, explicit== "False")
-notExplicit
+#notExplicit
 
 top20 <- slice_max(songs, order_by = popularity, n = 20) 
-top20
+#top20
 
 selected <- select(songs, popularity, song, danceability, energy, explicit, acousticness, liveness)
-selected
+#selected
 
 biggerSongs <- mutate(songs, 
        duration_s = duration_ms/1000,
        duration_minutes = duration_s/60)
-biggerSongs
+head(biggerSongs)
 shortestSongs <- arrange(biggerSongs, duration_minutes)
 longestSongs <- arrange(biggerSongs, desc(duration_minutes))
 shortestModified <- select(longestSongs, popularity, song, duration_minutes)
-shortestModified
+#shortestModified
 longestModified <- select(longestSongs, popularity, song, duration_minutes)
-longestModified
+#longestModified
 
 summarized <- summarise(songs, mean_popularity = mean(popularity, na.rm = T))
-summarized
+#summarized
 numOfPopularity <- summarise(group_by(songs, popularity), count = n()) # n()
-numOfPopularity
+#numOfPopularity
 
 ```
 
@@ -60,18 +60,18 @@ numOfPopularity
 # use a combination of filter, select, mutate, arrange, summarise, group_by, sample, and/or slice
 # create a visulaization using your new subset of data
 mostEnergetic <- filter(songs, energy > 0.50)
-mostEnergetic
+#mostEnergetic
 
 arrangedEnergetic <- arrange(mostEnergetic, desc(popularity)) 
-select(arrangedEnergetic, artist, song, popularity, energy)
+head(select(arrangedEnergetic, artist, song, popularity, energy))
 ggplot(data = songs, aes(x = energy, y = popularity)) + geom_point() 
 
-songs %>% 
+head(songs %>% 
   group_by(popularity) %>%
-  sample_n(1)
-songs %>% 
+  sample_n(1))
+head(songs %>% 
   group_by(year) %>%
-  sample_n(1)
+  sample_n(1))
 
 mu <- mean(songs$loudness)
 sig <- sd(songs$loudness)
@@ -93,25 +93,25 @@ ggplot(data = songs, aes(x = year, y = loudness)) + geom_point()  + theme_minima
 unique(songs$genre)
 
 popSongs <- filter(songs, str_detect(genre, "pop"))
-popSongs
+#popSongs
 hipHopSongs <- filter(songs, str_detect(genre, "hip hop"))
-hipHopSongs
+#hipHopSongs
 rockSongs <- filter(songs, str_detect(genre, "rock"))
-hipHopSongs
+#hipHopSongs
 metalSongs <- filter(songs, str_detect(genre, "metal"))
-metalSongs
+#metalSongs
 bluesSongs <- filter(songs, str_detect(genre, "blues"))
-bluesSongs
+#bluesSongs
 edmSongs <- filter(songs, str_detect(genre, "Dance/Electronic"))
-edmSongs
+#edmSongs
 countrySongs <- filter(songs, str_detect(genre, "country"))
-countrySongs
+#countrySongs
 folkSongs <- filter(songs, str_detect(genre, "Folk/Acoustic"))
-folkSongs
+#folkSongs
 latinSongs <- filter(songs, str_detect(genre, "latin"))
-latinSongs
+#latinSongs
 RandBSongs <- filter(songs, str_detect(genre, "R&B"))
-RandBSongs
+#RandBSongs
 
 
 
