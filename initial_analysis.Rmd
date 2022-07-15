@@ -2,41 +2,133 @@
 title: "initial_analysis"
 author: "Jonathan Kogan"
 date: '2022-07-15'
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
+```{r}
+library(dplyr)
+library(ggplot2)
+library(stringr)
+songs <- read.csv("data/songs_normalize.csv")
+```
+
+
+
+```{r}
+
+over70 <- filter(songs, popularity > 70)
+over70
+
+Drake <- filter(songs, artist == "Drake")
+arrange(Drake, desc(popularity))
+ggplot(data = over70, aes(x =  explicit)) + geom_bar() + labs(x = "Explicit or Not Explicit", y = "Number of songs", title = "Number of Explicit and Non explicit songs with popularity > 70");
+
+notExplicit <- filter(songs, explicit== "False")
+notExplicit
+
+top20 <- slice_max(songs, order_by = popularity, n = 20) 
+top20
+
+selected <- select(songs, popularity, song, danceability, energy, explicit, acousticness, liveness)
+selected
+
+biggerSongs <- mutate(songs, 
+       duration_s = duration_ms/1000,
+       duration_minutes = duration_s/60)
+biggerSongs
+shortestSongs <- arrange(biggerSongs, duration_minutes)
+longestSongs <- arrange(biggerSongs, desc(duration_minutes))
+shortestModified <- select(longestSongs, popularity, song, duration_minutes)
+shortestModified
+longestModified <- select(longestSongs, popularity, song, duration_minutes)
+longestModified
+
+summarized <- summarise(songs, mean_popularity = mean(popularity, na.rm = T))
+summarized
+numOfPopularity <- summarise(group_by(songs, popularity), count = n()) # n()
+numOfPopularity
+
+```
+
+
+
+
 
 ```{r}
 ## Practice subsetting data
 # use a combination of filter, select, mutate, arrange, summarise, group_by, sample, and/or slice
 # create a visulaization using your new subset of data
-library(dplyr)
-filtered <- filter(songs, popularity > 30, explicit = FALSE)
-filtered
-arrange(starwars, height)
-arrange(starwars, desc(height))
-select(starwars, contains("color"))
-select(starwars, ends_with("color"))
-select(starwars, contains("_"))
-select(starwars, starts_with("s"), ends_with("color"))
-mutate(starwars_small, 
-       height_m = height/100, 
-       bmi = mass/(height_m^2))
+mostEnergetic <- filter(songs, energy > 0.50)
+mostEnergetic
 
-# to only keep new columns, use transmute
-transmute(starwars_small, 
-          height_m = height/100, 
-          bmi = mass/(height_m^2))
-species_masses <- starwars %>%
-  group_by(species) %>%
-  summarise(mean_mass = mean(mass, na.rm = T),
-            count = n()) %>%
-  arrange(desc(mean_mass))
-summarise(starwars, mean_mass = mean(mass, na.rm = T))
-starwars %>% 
-  group_by(gender) %>%
-  sample_n(4)
-slice_min(starwars, order_by = height, n = 10) #rows with lowest 10 masses
-slice_max(starwars, order_by = mass, n = 10) #rows with highest 10 masses 
+arrangedEnergetic <- arrange(mostEnergetic, desc(popularity)) 
+select(arrangedEnergetic, artist, song, popularity, energy)
+ggplot(data = songs, aes(x = energy, y = popularity)) + geom_point() 
+
+songs %>% 
+  group_by(popularity) %>%
+  sample_n(1)
+songs %>% 
+  group_by(year) %>%
+  sample_n(1)
+
+mu <- mean(songs$loudness)
+sig <- sd(songs$loudness)
+iqr <- IQR(songs$loudness)
+q1 <- as.numeric(quantile(songs$loudness, 0.25))
+q3 <- as.numeric(quantile(songs$loudness, 0.75))
+mu - 3*sig #min1
+mu + 3*sig #max1
+q1 - iqr *1.5
+q3 + iqr *1.5
+withoutOutliers <- filter(songs, loudness > 9.974, loudness < -0.684)
+ggplot(data = songs, aes(x = year, y = loudness)) + geom_point()  + theme_minimal() + labs(x = "Year", y = "Loudness", title = "Year vs Loudness") + geom_smooth()
+ggplot(data = songs, aes(x = year, y = loudness)) + geom_point()  + theme_minimal() + labs(x = "Year", y = "Loudness", title = "Year vs Loudness(Without Outliers)") + geom_smooth()
+
+```
+
+
+```{r}
+unique(songs$genre)
+
+popSongs <- filter(songs, str_detect(genre, "pop"))
+popSongs
+hipHopSongs <- filter(songs, str_detect(genre, "hip hop"))
+hipHopSongs
+rockSongs <- filter(songs, str_detect(genre, "rock"))
+hipHopSongs
+metalSongs <- filter(songs, str_detect(genre, "metal"))
+metalSongs
+bluesSongs <- filter(songs, str_detect(genre, "blues"))
+bluesSongs
+edmSongs <- filter(songs, str_detect(genre, "Dance/Electronic"))
+edmSongs
+countrySongs <- filter(songs, str_detect(genre, "country"))
+countrySongs
+folkSongs <- filter(songs, str_detect(genre, "Folk/Acoustic"))
+folkSongs
+latinSongs <- filter(songs, str_detect(genre, "latin"))
+latinSongs
+RandBSongs <- filter(songs, str_detect(genre, "R&B"))
+RandBSongs
+
+
+
+```
+
+```{r}
+
+genres <- c(popSongs, hipHopSongs,hipHopSongs,metalSongs,bluesSongs,edmSongs ,countrySongs,folkSongs,latinSongs,RandBSongs)
+ggplot(data = popSongs, aes(x = popularity)) + geom_bar() + labs(x = "Pop Songs Popularity")
+ggplot(data = hipHopSongs, aes(x = popularity)) + geom_bar() + labs(x = "Hip Hop Songs Popularity")
+ggplot(data = metalSongs, aes(x = popularity)) + geom_bar() + labs(x = "Metal Songs Popularity")
+ggplot(data = bluesSongs, aes(x = popularity)) + geom_bar() + labs(x = "Blues Songs Popularity")
+ggplot(data = edmSongs, aes(x = popularity)) + geom_bar() + labs(x = "Edm Songs Popularity")
+ggplot(data = countrySongs, aes(x = popularity)) + geom_bar() + labs(x = "Country Songs Popularity")
+ggplot(data = latinSongs, aes(x = popularity)) + geom_bar() + labs(x = "Latin Songs Popularity")
+ggplot(data = RandBSongs, aes(x = popularity)) + geom_bar() + labs(x = "R&B Songs Popularity")
+
 
 ```
 
